@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import {
   TextField,
@@ -12,10 +11,18 @@ import {
 } from "@mui/material";
 import ParticlesBg from "particles-bg";
 
-const LoginForm = () => {
+const Signup = () => {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [bio, setBio] = useState("");
   const [error, setError] = useState("");
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+  };
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -25,20 +32,36 @@ const LoginForm = () => {
     setPassword(e.target.value);
   };
 
+  const handleFirstnameChange = (e) => {
+    setFirstname(e.target.value);
+  };
+
+  const handleLastnameChange = (e) => {
+    setLastname(e.target.value);
+  };
+
+  const handleBioChange = (e) => {
+    setBio(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/users/login",
+        "http://localhost:3000/api/users/createUser",
         {
-          email: email,
-          password: password,
+          username,
+          email,
+          password,
+          first_name: firstname,
+          last_name: lastname,
+          profile_picture: "None",
+          bio,
         }
       );
-      console.log("Login successful", response.data);
-      localStorage.setItem("token", response.data.token);
-      // window.location.href = "/dashboard";
+      console.log("Signup successful", response.data);
+      window.location.href = "/home";
     } catch (err) {
       if (err.response) {
         setError(err.response.data.error);
@@ -49,7 +72,7 @@ const LoginForm = () => {
   return (
     <div>
       <ParticlesBg type="cobweb" bg={true} />
-      <Container maxWidth="xs" sx={{ position: "relative", height: "100vh" }}>
+      <Container maxWidth="xs">
         <Box
           sx={{
             display: "flex",
@@ -57,8 +80,6 @@ const LoginForm = () => {
             alignItems: "center",
             justifyContent: "center",
             height: "100vh",
-            position: "relative",
-            zIndex: 1,
           }}
         >
           <Fade in={true} timeout={1000}>
@@ -79,7 +100,7 @@ const LoginForm = () => {
                 color="textSecondary"
                 gutterBottom
               >
-                Login
+                Signup
               </Typography>
               <Box
                 component="form"
@@ -91,11 +112,23 @@ const LoginForm = () => {
                   margin="normal"
                   required
                   fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
+                  autoFocus
+                  value={username}
+                  onChange={handleUsernameChange}
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
                   id="email"
                   label="Email"
                   name="email"
                   autoComplete="email"
-                  autoFocus
                   value={email}
                   onChange={handleEmailChange}
                 />
@@ -112,6 +145,41 @@ const LoginForm = () => {
                   value={password}
                   onChange={handlePasswordChange}
                 />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="firstname"
+                  label="First Name"
+                  name="firstname"
+                  autoComplete="firstname"
+                  value={firstname}
+                  onChange={handleFirstnameChange}
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="lastname"
+                  label="Last Name"
+                  name="lastname"
+                  autoComplete="lastname"
+                  value={lastname}
+                  onChange={handleLastnameChange}
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  fullWidth
+                  id="bio"
+                  label="Bio"
+                  name="bio"
+                  autoComplete="bio"
+                  value={bio}
+                  onChange={handleBioChange}
+                />
                 {error && <Alert severity="error">{error}</Alert>}
                 <Button
                   type="submit"
@@ -119,27 +187,28 @@ const LoginForm = () => {
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
                 >
-                  Login
+                  Signup
                 </Button>
               </Box>
               <Box
                 sx={{
                   mt: 2,
                   display: "flex",
-                  justifyContent: "center",
+                  justifyContent: "space-between",
                   width: "100%",
                 }}
               >
                 <Typography variant="body2" color="primary">
-                  <Link
-                    to="/signup"
+                  <a
+                    href="/login"
                     style={{
                       textDecoration: "underline",
                       color: "#1976d2",
+                      paddingRight: "8px",
                     }}
                   >
-                    Create a new account
-                  </Link>
+                    Already have an account? Login
+                  </a>
                 </Typography>
               </Box>
             </Box>
@@ -150,4 +219,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default Signup;
