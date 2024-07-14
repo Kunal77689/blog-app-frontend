@@ -61,7 +61,7 @@ const Signup = () => {
         }
       );
       console.log("Signup successful", response.data);
-      window.location.href = "/home";
+      window.location.href = "/";
     } catch (err) {
       if (err.response) {
         setError(err.response.data.error);

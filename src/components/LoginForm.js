@@ -38,7 +38,7 @@ const LoginForm = () => {
       );
       console.log("Login successful", response.data);
       localStorage.setItem("token", response.data.token);
-      // window.location.href = "/dashboard";
+      window.location.href = "/";
     } catch (err) {
       if (err.response) {
         setError(err.response.data.error);
