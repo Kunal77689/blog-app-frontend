@@ -29,6 +29,7 @@ const LoginForm = () => {
     e.preventDefault();
     setError(null);
     try {
+      // Perform login
       const response = await axios.post(
         "http://localhost:3000/api/users/login",
         {
@@ -37,7 +38,27 @@ const LoginForm = () => {
         }
       );
       console.log("Login successful", response.data);
+
+      // Store the token in localStorage
       localStorage.setItem("token", response.data.token);
+
+      // Fetch the user ID
+      const userIdResponse = await axios.get(
+        `http://localhost:3000/api/users/getUserId/${email}`,
+        {
+          headers: {
+            Authorization: `Bearer ${response.data.token}`,
+          },
+        }
+      );
+
+      const userId = userIdResponse.data.user.id;
+      console.log("User ID:", userId);
+
+      // Store the user ID in localStorage
+      localStorage.setItem("userId", userId);
+
+      // Redirect to the homepage
       window.location.href = "/";
     } catch (err) {
       if (err.response) {
