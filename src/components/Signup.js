@@ -61,7 +61,7 @@ const Signup = () => {
         }
       );
       console.log("Signup successful", response.data);
-      window.location.href = "/";
+      window.location.href = "/login";
     } catch (err) {
       if (err.response) {
         setError(err.response.data.error);

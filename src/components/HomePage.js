@@ -10,11 +10,7 @@ import {
   DialogActions,
   IconButton,
 } from "@mui/material";
-import {
-  ChevronLeft,
-  ChevronRight,
-  AccountCircleIcon,
-} from "@mui/icons-material";
+import { ChevronLeft, ChevronRight, AccountCircle } from "@mui/icons-material";
 import Marquee from "react-fast-marquee"; // Import Marquee component
 import Navbar from "./Navbar";
 import axios from "axios";
@@ -27,6 +23,7 @@ const HomePage = () => {
   const [selectedPostIndex, setSelectedPostIndex] = useState(null);
   const [usernames, setUsernames] = useState({}); // State to hold usernames
   const [posts, setPosts] = useState([]);
+  const [topLikedPosts, setTopLikedPosts] = useState([]);
 
   useEffect(() => {
     const fetchPostsAndTopHashtags = async () => {
@@ -76,7 +73,26 @@ const HomePage = () => {
       }
     };
 
+    const fetchTopLikedPosts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await axios.get(
+          "http://localhost:3000/api/likes/top-liked-posts",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setTopLikedPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching top liked posts:", error);
+      }
+    };
+
     fetchPostsAndTopHashtags();
+    fetchTopLikedPosts();
   }, []); // Empty dependency array ensures this effect runs once on component mount
 
   // Function to filter posts by hashtag and display in a dialog
@@ -137,6 +153,11 @@ const HomePage = () => {
     }
   };
 
+  // Filter posts to include only top liked posts
+  const filteredTopLikedPosts = posts.filter((post) =>
+    topLikedPosts.some((topPost) => topPost.post_id === post.id)
+  );
+
   return (
     <div>
       <Navbar />
@@ -182,57 +203,53 @@ const HomePage = () => {
             direction="left"
             marginLeft="10px"
           >
-            <Grid container spacing={4} style={{ marginTop: "40px" }}>
-              {/* Example Project Cards */}
-              <Grid item xs={12} md={4}>
-                <Box
-                  sx={{
-                    minHeight: "300px",
-                    backgroundColor: "#e3f2fd",
-                    padding: "20px",
-                    marginBottom: "40px",
-                    cursor: "pointer",
-                  }}
+            <Grid
+              container
+              spacing={4}
+              style={{
+                marginTop: "40px",
+                display: "flex",
+                flexWrap: "nowrap",
+                marginRight: "35px",
+              }}
+            >
+              {filteredTopLikedPosts.map((post) => (
+                <Grid
+                  item
+                  key={post.id}
+                  style={{ flex: "0 0 auto", width: "500px" }}
                 >
-                  <Typography variant="h6">Project Title1</Typography>
-                  <Typography variant="body1">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Box
-                  sx={{
-                    minHeight: "300px",
-                    backgroundColor: "#f0f4c3",
-                    padding: "20px",
-                    marginBottom: "40px",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Typography variant="h6">Project Title2</Typography>
-                  <Typography variant="body1">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Box
-                  sx={{
-                    minHeight: "300px",
-                    backgroundColor: "#f8bbd0",
-                    padding: "20px",
-                    marginBottom: "40px",
-                    cursor: "pointer",
-                    marginRight: "30px",
-                  }}
-                >
-                  <Typography variant="h6">Project Title3</Typography>
-                  <Typography variant="body1">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  </Typography>
-                </Box>
-              </Grid>
+                  <Box
+                    sx={{
+                      minHeight: "300px",
+                      backgroundColor: "#e3f2fd",
+                      padding: "20px",
+                      borderRadius: "20px",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                      transition: "transform 0.3s ease-in-out",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      "&:hover": {
+                        transform: "scale(1.02)",
+                      },
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="h6">{post.title}</Typography>
+                    </Box>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body1">{post.content}</Typography>
+                      <Typography variant="body2">
+                        {new Date(post.created_at).toLocaleDateString()}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Grid>
+              ))}
             </Grid>
           </Marquee>
         </Container>

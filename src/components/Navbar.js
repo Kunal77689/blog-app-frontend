@@ -10,6 +10,8 @@ import {
   ListItemText,
   MenuItem,
   Menu,
+  Box,
+  Button,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -46,6 +48,15 @@ const Navbar = () => {
   const handleNavigation = (path) => {
     window.location.href = path;
     handleMenuClose(); // Close the menu after navigation
+  };
+
+  const handleLogout = () => {
+    // Clear local storage
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+
+    // Navigate to login screen
+    window.location.href = "/login";
   };
 
   const renderCategoriesDropdown = () => (
@@ -95,18 +106,34 @@ const Navbar = () => {
         onClose={toggleDrawer(false)}
         sx={{ backgroundColor: "#f0f0f0" }}
       >
-        <List style={{ width: 250 }} onClick={toggleDrawer(false)}>
-          <ListItem button onClick={() => handleNavigation("/categories")}>
-            <ListItemText primary="Posts" />
-          </ListItem>
-          <ListItem button onClick={() => handleNavigation("/")}>
-            <ListItemText primary="Home" />
-          </ListItem>
-          <ListItem button onClick={handleMenuClose}>
-            <ListItemText primary="Categories" />
-            {renderCategoriesDropdown()}
-          </ListItem>
-        </List>
+        <Box
+          style={{
+            width: 250,
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}
+        >
+          <List onClick={toggleDrawer(false)}>
+            <ListItem button onClick={() => handleNavigation("/categories")}>
+              <ListItemText primary="Posts" />
+            </ListItem>
+            <ListItem button onClick={() => handleNavigation("/")}>
+              <ListItemText primary="Home" />
+            </ListItem>
+          </List>
+          <Box sx={{ flexGrow: 1 }}></Box>
+          <Box sx={{ padding: "10px" }}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleLogout}
+              fullWidth
+            >
+              Logout
+            </Button>
+          </Box>
+        </Box>
       </Drawer>
     </>
   );

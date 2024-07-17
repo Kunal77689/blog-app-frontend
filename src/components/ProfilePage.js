@@ -5,22 +5,30 @@ import {
   Box,
   Avatar,
   Grid,
-  Divider,
   Button,
+  TextField,
 } from "@mui/material";
 import Navbar from "./Navbar";
 import axios from "axios";
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({
+    username: "",
+    first_name: "",
+    last_name: "",
+    bio: "",
+    email: "",
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const userId = localStorage.getItem("userId"); // Assuming userId is stored in localStorage
+        const userId = localStorage.getItem("userId");
 
-        const userResponse = await axios.get(
+        const userIdResponse = await axios.get(
           `http://localhost:3000/api/users/getUserById/${userId}`,
           {
             headers: {
@@ -29,7 +37,26 @@ const ProfilePage = () => {
           }
         );
 
+        const username = userIdResponse.data.username;
+
+        // Next, get the full user details using the username
+        const userResponse = await axios.get(
+          `http://localhost:3000/api/users/getUserByUsername/${username}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
         setUserData(userResponse.data);
+        setFormData({
+          username: userResponse.data.username || "",
+          first_name: userResponse.data.first_name || "",
+          last_name: userResponse.data.last_name || "",
+          bio: userResponse.data.bio || "",
+          email: userResponse.data.email || "",
+        });
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -38,11 +65,50 @@ const ProfilePage = () => {
     fetchUserData();
   }, []);
 
+  const handleEditToggle = () => {
+    setEditMode(!editMode);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      console.log(formData);
+      await axios.put(
+        `http://localhost:3000/api/users/updateUser/${userId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update local state with updated data
+      setUserData(formData);
+      setEditMode(false);
+    } catch (error) {
+      console.error("Error updating user data:", error);
+    }
+  };
+
+  const getUsernameInitial = (username) => {
+    return username ? username[0].toUpperCase() : "";
+  };
+
   return (
     <div>
       <Navbar />
 
-      {/* Profile Header */}
       <Box
         sx={{
           backgroundColor: "#f0f0f0",
@@ -51,43 +117,129 @@ const ProfilePage = () => {
         }}
       >
         <Container maxWidth="md">
-          <Avatar
-            alt="User Avatar"
-            src={userData?.avatar || "/default-avatar.png"} // Example default avatar path
-            sx={{ width: 120, height: 120, marginBottom: 2 }}
-          />
-          <Typography variant="h4" gutterBottom>
-            {userData?.username || "Username"}
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginBottom: 2,
+            }}
+          >
+            <Avatar
+              alt="User Avatar"
+              src={userData?.avatar || ""}
+              sx={{ width: 120, height: 120, marginBottom: 2 }}
+            >
+              <Typography variant="h3">
+                {getUsernameInitial(userData?.username)}
+              </Typography>
+            </Avatar>
+            <Typography variant="h4" gutterBottom>
+              {userData?.username || "Username"}
+            </Typography>
+          </Box>
           <Typography variant="body1" gutterBottom>
             {userData?.bio || "Bio goes here."}
           </Typography>
         </Container>
       </Box>
 
-      {/* Additional Profile Information */}
       <Box sx={{ padding: "40px 0" }}>
         <Container maxWidth="md">
           <Typography variant="h5" gutterBottom>
-            Additional Information
+            Profile Information
           </Typography>
           <Grid container spacing={3}>
-            {/* Example additional information */}
             <Grid item xs={6}>
               <Typography variant="body1">
-                <strong>Email:</strong> {userData?.email || "Email"}
+                <strong>First Name:</strong>
               </Typography>
+              {editMode ? (
+                <TextField
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              ) : (
+                <Typography>{userData?.first_name || "First Name"}</Typography>
+              )}
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">
-                <strong>Location:</strong> {userData?.location || "Location"}
+                <strong>Last Name:</strong>
               </Typography>
+              {editMode ? (
+                <TextField
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              ) : (
+                <Typography>{userData?.last_name || "Last Name"}</Typography>
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                <strong>Email:</strong>
+              </Typography>
+              {editMode ? (
+                <TextField
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              ) : (
+                <Typography>{userData?.email || "Email"}</Typography>
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                <strong>Username:</strong>
+              </Typography>
+              {editMode ? (
+                <TextField
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              ) : (
+                <Typography>{userData?.username || "Username"}</Typography>
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                <strong>Bio:</strong>
+              </Typography>
+              {editMode ? (
+                <TextField
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleChange}
+                  fullWidth
+                  multiline
+                  rows={4}
+                />
+              ) : (
+                <Typography>{userData?.bio || "Bio"}</Typography>
+              )}
             </Grid>
           </Grid>
+          <Box sx={{ marginTop: 3 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={editMode ? handleSave : handleEditToggle}
+            >
+              {editMode ? "Save Changes" : "Edit Profile"}
+            </Button>
+          </Box>
         </Container>
       </Box>
 
-      {/* Footer */}
       <Box
         sx={{
           backgroundColor: "#222",
@@ -98,7 +250,7 @@ const ProfilePage = () => {
       >
         <Container maxWidth="md">
           <Typography variant="body1">
-            © {new Date().getFullYear()} Your Company. All rights reserved.
+            © {new Date().getFullYear()} Thoughtful Bytes. All rights reserved.
           </Typography>
         </Container>
       </Box>
