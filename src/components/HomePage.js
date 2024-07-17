@@ -8,6 +8,8 @@ import {
   Dialog,
   DialogContent,
   DialogActions,
+  Snackbar,
+  Alert,
   IconButton,
 } from "@mui/material";
 import { ChevronLeft, ChevronRight, AccountCircle } from "@mui/icons-material";
@@ -24,7 +26,23 @@ const HomePage = () => {
   const [usernames, setUsernames] = useState({}); // State to hold usernames
   const [posts, setPosts] = useState([]);
   const [topLikedPosts, setTopLikedPosts] = useState([]);
+  const [showMessage, setShowMessage] = useState(false);
 
+  const handleJoinClick = () => {
+    // Simulate adding email to list
+    setShowMessage(true);
+
+    // For real implementation, you would typically make an API call to add the email to a list
+    // and handle success or error accordingly.
+  };
+
+  const handleCloseMessage = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setShowMessage(false);
+  };
   useEffect(() => {
     const fetchPostsAndTopHashtags = async () => {
       try {
@@ -301,11 +319,23 @@ const HomePage = () => {
             color="secondary"
             size="large"
             style={{ marginTop: "20px" }}
+            onClick={handleJoinClick}
           >
-            Sign Up Now
+            Join
           </Button>
         </Container>
       </Box>
+
+      <Snackbar
+        open={showMessage}
+        autoHideDuration={4000}
+        onClose={handleCloseMessage}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseMessage} severity="success">
+          Email added to the list
+        </Alert>
+      </Snackbar>
 
       {/* Footer */}
       <Box

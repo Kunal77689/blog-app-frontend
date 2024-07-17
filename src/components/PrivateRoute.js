@@ -1,15 +1,15 @@
-import React from "react";
-import { Route, redirect } from "react-router-dom";
+// PrivateRoute.js
 
-const PrivateRoute = ({ component: Component, ...rest }) => {
+import React from "react";
+import { Route, Navigate } from "react-router-dom";
+
+const PrivateRoute = ({ element: Component, ...rest }) => {
   const token = localStorage.getItem("token");
 
   return (
     <Route
       {...rest}
-      render={(props) =>
-        token ? <Component {...props} /> : redirect("/login")
-      }
+      element={token ? <Component /> : <Navigate to="/login" replace />}
     />
   );
 };
