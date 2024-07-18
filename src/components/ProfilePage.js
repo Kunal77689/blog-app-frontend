@@ -29,7 +29,7 @@ const ProfilePage = () => {
         const userId = localStorage.getItem("userId");
 
         const userIdResponse = await axios.get(
-          `http://localhost:3000/api/users/getUserById/${userId}`,
+          `http://3.133.105.39:3000/api/users/getUserById/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -41,7 +41,7 @@ const ProfilePage = () => {
 
         // Next, get the full user details using the username
         const userResponse = await axios.get(
-          `http://localhost:3000/api/users/getUserByUsername/${username}`,
+          `http://3.133.105.39:3000/api/users/getUserByUsername/${username}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -84,7 +84,7 @@ const ProfilePage = () => {
 
       console.log(formData);
       await axios.put(
-        `http://localhost:3000/api/users/updateUser/${userId}`,
+        `http://3.133.105.39:3000/api/users/updateUser/${userId}`,
         formData,
         {
           headers: {

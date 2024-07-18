@@ -49,7 +49,7 @@ const Signup = () => {
     setError(null);
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/users/createUser",
+        "http://3.133.105.39:3000/api/users/createUser",
         {
           username,
           email,

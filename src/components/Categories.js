@@ -27,7 +27,7 @@ const Categories = () => {
 
         // Fetch posts
         const postsResponse = await axios.get(
-          "http://localhost:3000/api/posts/",
+          "http://3.133.105.39:3000/api/posts/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ const Categories = () => {
 
         // Fetch liked posts for the user
         const likesResponse = await axios.get(
-          `http://localhost:3000/api/likes/user/${userId}`,
+          `http://3.133.105.39:3000/api/likes/user/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -62,7 +62,7 @@ const Categories = () => {
     try {
       if (likedPosts.includes(postId)) {
         // If the post is already liked, unlike it
-        await axios.delete(`http://localhost:3000/api/likes/delete/`, {
+        await axios.delete(`http://3.133.105.39:3000/api/likes/delete/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -75,7 +75,7 @@ const Categories = () => {
       } else {
         // If the post is not liked, like it
         await axios.post(
-          `http://localhost:3000/api/likes/create`,
+          `http://3.133.105.39:3000/api/likes/create`,
           { post_id: postId, user_id: userId },
           {
             headers: {
@@ -100,7 +100,7 @@ const Categories = () => {
 
       // Fetch user details by userId
       const userResponse = await axios.get(
-        `http://localhost:3000/api/users/getUserById/${userId}`,
+        `http://3.133.105.39:3000/api/users/getUserById/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

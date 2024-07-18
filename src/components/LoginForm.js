@@ -31,7 +31,7 @@ const LoginForm = () => {
     try {
       // Perform login
       const response = await axios.post(
-        "http://localhost:3000/api/users/login",
+        "http://3.133.105.39:3000/api/users/login",
         {
           email: email,
           password: password,
@@ -44,7 +44,7 @@ const LoginForm = () => {
 
       // Fetch the user ID
       const userIdResponse = await axios.get(
-        `http://localhost:3000/api/users/getUserId/${email}`,
+        `http://3.133.105.39:3000/api/users/getUserId/${email}`,
         {
           headers: {
             Authorization: `Bearer ${response.data.token}`,

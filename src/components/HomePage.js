@@ -50,7 +50,7 @@ const HomePage = () => {
 
         // Fetch posts
         const postsResponse = await axios.get(
-          "http://localhost:3000/api/posts/",
+          "http://3.133.105.39:3000/api/posts/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -96,7 +96,7 @@ const HomePage = () => {
         const token = localStorage.getItem("token");
 
         const response = await axios.get(
-          "http://localhost:3000/api/likes/top-liked-posts",
+          "http://3.133.105.39:3000/api/likes/top-liked-posts",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -129,7 +129,7 @@ const HomePage = () => {
       userIds.map(async (userId) => {
         try {
           const userResponse = await axios.get(
-            `http://localhost:3000/api/users/getUserById/${userId}`,
+            `http://3.133.105.39:3000/api/users/getUserById/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
