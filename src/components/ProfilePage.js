@@ -83,10 +83,43 @@ const ProfilePage = () => {
     setFile(e.target.files[0]);
   };
 
-  const handleSave = async () => {
+  const handleSaveProfile = async () => {
     try {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
+
+      // Update user profile without changing the avatar
+      await axios.put(
+        `http://3.133.105.39:3000/api/users/updateUser/${userId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update local state with updated data
+      setUserData((prevData) => ({
+        ...prevData,
+        ...formData,
+      }));
+
+      setEditMode(false);
+    } catch (error) {
+      console.error("Error updating user data:", error);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current.click(); // Trigger file input click programmatically
+  };
+
+  const handleAvatarUpload = async () => {
+    try {
+      if (!file) return;
+
+      const token = localStorage.getItem("token");
 
       const uploadUrlResponse = await axios.post(
         `http://3.133.105.39:3000/api/users/uploadAvatar`,
@@ -103,7 +136,6 @@ const ProfilePage = () => {
 
       const { url } = uploadUrlResponse.data;
 
-      console.log("The url is:", url);
       // Upload the file to S3 using the generated URL
       await axios.put(url, file, {
         headers: {
@@ -114,9 +146,8 @@ const ProfilePage = () => {
       // Update user profile with new avatar URL
       const imageUrl = url.split("?")[0]; // Get the actual image URL without query params
       await axios.put(
-        `http://3.133.105.39:3000/api/users/updateUser/${userId}`,
+        `http://3.133.105.39:3000/api/users/updateUser/${userData.id}`,
         {
-          ...formData,
           avatar: imageUrl, // Assuming your backend updates the avatar field
         },
         {
@@ -132,19 +163,10 @@ const ProfilePage = () => {
         avatar: imageUrl,
       }));
 
-      setEditMode(false);
       setFile(null); // Clear the file after upload
     } catch (error) {
-      console.error("Error updating user data:", error);
+      console.error("Error updating avatar:", error);
     }
-  };
-
-  const getUsernameInitial = (username) => {
-    return username ? username[0].toUpperCase() : "";
-  };
-
-  const handleAvatarClick = () => {
-    fileInputRef.current.click(); // Trigger file input click programmatically
   };
 
   return (
@@ -181,7 +203,7 @@ const ProfilePage = () => {
             >
               {!userData?.avatar && (
                 <Typography variant="h3">
-                  {getUsernameInitial(userData?.username)}
+                  {userData?.username[0].toUpperCase()}
                 </Typography>
               )}
             </Avatar>
@@ -192,19 +214,19 @@ const ProfilePage = () => {
               style={{ display: "none" }}
               onChange={handleFileChange}
             />
-            <Typography variant="h4" gutterBottom>
-              {userData?.username || "Username"}
-            </Typography>
             {file && (
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleSave} // Add the new button to upload the picture
+                onClick={handleAvatarUpload} // Separate button to upload the avatar
                 sx={{ mt: 2 }}
               >
                 Change Picture
               </Button>
             )}
+            <Typography variant="h4" gutterBottom>
+              {userData?.username || "Username"}
+            </Typography>
           </Box>
           <Typography variant="body1" gutterBottom>
             {userData?.bio || "Bio goes here."}
@@ -300,7 +322,7 @@ const ProfilePage = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={editMode ? handleSave : handleEditToggle}
+              onClick={editMode ? handleSaveProfile : handleEditToggle}
             >
               {editMode ? "Save Changes" : "Edit Profile"}
             </Button>

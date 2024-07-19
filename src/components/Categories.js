@@ -156,6 +156,9 @@ const Categories = () => {
                     cursor: "pointer",
                     display: "flex",
                     flexDirection: "column",
+                    backgroundImage: `url(${post.post_image})`, // Set background image
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
                     "&:hover": {
                       transform: "scale(1.05)",
                     },
@@ -163,16 +166,17 @@ const Categories = () => {
                   onClick={() => handleOpen(index)}
                 >
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle1">{post.title}</Typography>
+                    <Typography variant="subtitle1" color={"#ffffff"}>
+                      {post.title}
+                    </Typography>
                   </Box>
                   <Box
                     sx={{
-                      borderTop: "2px solid #3f51b5",
                       padding: "10px",
                       marginTop: "auto",
                     }}
                   >
-                    <Typography variant="body2">
+                    <Typography variant="body2" color={"#ffffff"}>
                       {post.content.length > 50
                         ? `${post.content.substring(0, 50)}...`
                         : post.content}
@@ -211,25 +215,45 @@ const Categories = () => {
       {/* Dialog for displaying post details */}
       {selectedPostIndex !== null && (
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-          <DialogContent sx={{ display: "flex" }}>
+          <DialogContent
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              backgroundColor: "#ffffff",
+            }}
+          >
+            {/* Image Section */}
             <Box
               sx={{
                 flex: 1,
+                backgroundImage: `url(${posts[selectedPostIndex].post_image})`, // Set background image
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                height: "400px",
+                borderRadius: "8px 0 0 8px",
                 backgroundColor: "#e3f2fd",
-                padding: "20px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
               }}
-            >
-              {/* Replace with image or solid background */}
-              <Typography variant="h6"></Typography>
+            />
+
+            {/* Content Section */}
+            <Box sx={{ flex: 2, padding: "20px" }}>
+              <Typography variant="h4" gutterBottom>
+                {posts[selectedPostIndex].title}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Created by{" "}
+                {selectedPostUser
+                  ? selectedPostUser
+                  : posts[selectedPostIndex].user_id}
+              </Typography>
+              <Typography variant="body1">
+                {posts[selectedPostIndex].content}
+              </Typography>
               <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   mt: "auto",
-                  height: "400px",
                 }}
               >
                 <IconButton
@@ -257,20 +281,6 @@ const Categories = () => {
                   <ChevronRight />
                 </IconButton>
               </Box>
-            </Box>
-            <Box sx={{ flex: 2, padding: "20px" }}>
-              <Typography variant="h4" gutterBottom>
-                {posts[selectedPostIndex].title}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Created by{" "}
-                {selectedPostUser
-                  ? selectedPostUser
-                  : posts[selectedPostIndex].user_id}
-              </Typography>
-              <Typography variant="body1">
-                {posts[selectedPostIndex].content}
-              </Typography>
             </Box>
           </DialogContent>
         </Dialog>

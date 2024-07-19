@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import PostAddIcon from "@mui/icons-material/PostAdd"; // Import a suitable icon for creating posts
 
 const Navbar = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -89,7 +90,17 @@ const Navbar = () => {
             variant="h6"
             style={{ textDecoration: "none", flexGrow: 1, cursor: "pointer" }}
             onClick={() => handleNavigation("/")}
-          ></Typography>
+          >
+            {/* Replace with site title or logo */}
+          </Typography>
+          <IconButton
+            color="#404040"
+            aria-label="create post"
+            edge="end"
+            onClick={() => handleNavigation("/createpost")}
+          >
+            <PostAddIcon /> {/* Add an icon to represent creating a post */}
+          </IconButton>
           <IconButton
             color="#404040"
             aria-label="profile"
@@ -115,6 +126,9 @@ const Navbar = () => {
           }}
         >
           <List onClick={toggleDrawer(false)}>
+            <ListItem button onClick={() => handleNavigation("/createpost")}>
+              <ListItemText primary="Create New Post" />
+            </ListItem>
             <ListItem button onClick={() => handleNavigation("/categories")}>
               <ListItemText primary="Posts" />
             </ListItem>
