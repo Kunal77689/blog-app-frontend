@@ -127,7 +127,7 @@ const Navbar = () => {
         >
           <List onClick={toggleDrawer(false)}>
             <ListItem button onClick={() => handleNavigation("/createpost")}>
-              <ListItemText primary="Create New Post" />
+              <ListItemText primary="Create" />
             </ListItem>
             <ListItem button onClick={() => handleNavigation("/categories")}>
               <ListItemText primary="Posts" />

@@ -12,8 +12,8 @@ import {
   Alert,
   IconButton,
 } from "@mui/material";
-import { ChevronLeft, ChevronRight, AccountCircle } from "@mui/icons-material";
-import Marquee from "react-fast-marquee"; // Import Marquee component
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import Marquee from "react-fast-marquee";
 import Navbar from "./Navbar";
 import axios from "axios";
 
@@ -23,32 +23,27 @@ const HomePage = () => {
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPostIndex, setSelectedPostIndex] = useState(null);
-  const [usernames, setUsernames] = useState({}); // State to hold usernames
+  const [usernames, setUsernames] = useState({});
   const [posts, setPosts] = useState([]);
   const [topLikedPosts, setTopLikedPosts] = useState([]);
   const [showMessage, setShowMessage] = useState(false);
 
   const handleJoinClick = () => {
-    // Simulate adding email to list
     setShowMessage(true);
-
-    // For real implementation, you would typically make an API call to add the email to a list
-    // and handle success or error accordingly.
   };
 
   const handleCloseMessage = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-
     setShowMessage(false);
   };
+
   useEffect(() => {
     const fetchPostsAndTopHashtags = async () => {
       try {
         const token = localStorage.getItem("token");
 
-        // Fetch posts
         const postsResponse = await axios.get(
           "http://3.133.105.39:3000/api/posts/",
           {
@@ -58,10 +53,9 @@ const HomePage = () => {
           }
         );
 
-        const fetchedPosts = postsResponse.data; // Store fetched posts
-        setPosts(fetchedPosts); // Update posts state
+        const fetchedPosts = postsResponse.data;
+        setPosts(fetchedPosts);
 
-        // Extract hashtags from each post's content
         const hashtagsMap = {};
         fetchedPosts.forEach((post) => {
           const content = post.content;
@@ -78,12 +72,10 @@ const HomePage = () => {
           }
         });
 
-        // Sort hashtags by frequency in descending order
         const sortedHashtags = Object.keys(hashtagsMap).sort(
           (a, b) => hashtagsMap[b] - hashtagsMap[a]
         );
 
-        // Get top 4 hashtags
         const top4Hashtags = sortedHashtags.slice(0, 4);
         setTopHashtags(top4Hashtags);
       } catch (error) {
@@ -111,17 +103,15 @@ const HomePage = () => {
 
     fetchPostsAndTopHashtags();
     fetchTopLikedPosts();
-  }, []); // Empty dependency array ensures this effect runs once on component mount
+  }, []);
 
-  // Function to filter posts by hashtag and display in a dialog
   const handleTagClick = async (tag) => {
     setSelectedTag(tag);
     const filtered = posts.filter((post) => post.content.includes(tag));
     setFilteredPosts(filtered);
-    setSelectedPostIndex(0); // Display first post by default
+    setSelectedPostIndex(0);
     setDialogOpen(true);
 
-    // Fetch usernames for filtered posts
     const userIds = filtered.map((post) => post.user_id);
     const token = localStorage.getItem("token");
     const usernamesMap = {};
@@ -150,13 +140,12 @@ const HomePage = () => {
     setUsernames(usernamesMap);
   };
 
-  // Close dialog
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setSelectedTag(null);
     setFilteredPosts([]);
     setSelectedPostIndex(null);
-    setUsernames({}); // Clear usernames state
+    setUsernames({});
   };
 
   const handlePreviousPost = () => {
@@ -171,7 +160,6 @@ const HomePage = () => {
     }
   };
 
-  // Filter posts to include only top liked posts
   const filteredTopLikedPosts = posts.filter((post) =>
     topLikedPosts.some((topPost) => topPost.post_id === post.id)
   );
@@ -240,7 +228,9 @@ const HomePage = () => {
                   <Box
                     sx={{
                       minHeight: "300px",
-                      backgroundColor: "#e3f2fd",
+                      backgroundImage: `url(${post.post_image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
                       padding: "20px",
                       borderRadius: "20px",
                       boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
@@ -253,16 +243,14 @@ const HomePage = () => {
                         transform: "scale(1.02)",
                       },
                     }}
+                    onClick={() => (window.location.href = "/categories")}
                   >
                     <Box>
-                      <Typography variant="h6">{post.title}</Typography>
-                    </Box>
-                    <Box
-                      sx={{ display: "flex", justifyContent: "space-between" }}
-                    >
-                      <Typography variant="body1">{post.content}</Typography>
-                      <Typography variant="body2">
-                        {new Date(post.created_at).toLocaleDateString()}
+                      <Typography variant="h6" color="white" fontWeight="bold">
+                        {post.title}
+                      </Typography>
+                      <Typography variant="body2" color="white">
+                        {post.content.substring(0, 100)}...
                       </Typography>
                     </Box>
                   </Box>
@@ -280,7 +268,6 @@ const HomePage = () => {
             Top Hashtags
           </Typography>
           <Grid container spacing={4} style={{ marginTop: "40px" }}>
-            {/* Display top hashtags dynamically */}
             {topHashtags.map((tag, index) => (
               <Grid item xs={12} md={6} key={index}>
                 <Box
@@ -289,11 +276,11 @@ const HomePage = () => {
                     padding: "20px",
                     borderRadius: "8px",
                     cursor: "pointer",
+                    textAlign: "center",
                   }}
                   onClick={() => handleTagClick(tag)}
                 >
                   <Typography variant="body1">{tag}</Typography>
-                  {/* Example subtitle */}
                 </Box>
               </Grid>
             ))}
@@ -328,107 +315,104 @@ const HomePage = () => {
 
       <Snackbar
         open={showMessage}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         onClose={handleCloseMessage}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        message="Thank you for joining us! Your creativity is appreciated."
+        action={
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleCloseMessage}
+          >
+            <IconButton />
+          </IconButton>
+        }
       >
-        <Alert onClose={handleCloseMessage} severity="success">
-          Email added to the list
+        <Alert
+          onClose={handleCloseMessage}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Thank you for joining us! Your creativity is appreciated.
         </Alert>
       </Snackbar>
 
-      {/* Footer */}
-      <Box
-        sx={{
-          backgroundColor: "#222",
-          color: "#fff",
-          textAlign: "center",
-          padding: "40px 0",
-        }}
-      >
-        <Container maxWidth="lg">
-          <Typography variant="body1" gutterBottom>
-            © {new Date().getFullYear()} Thoughtful Bytes. All rights reserved.
-          </Typography>
-        </Container>
-      </Box>
-
-      {/* Dialog for Filtered Posts */}
+      {/* Dialog for Posts */}
       <Dialog
         open={dialogOpen}
         onClose={handleCloseDialog}
-        maxWidth="md"
         fullWidth
+        maxWidth="sm"
       >
-        <DialogContent sx={{ display: "flex" }}>
-          {/* Left side with arrows */}
-          <Box
-            sx={{
-              flex: 1,
-              backgroundColor: "#e3f2fd",
-              padding: "20px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-            }}
-          >
-            {/* Replace with image or solid background */}
-            <Typography variant="h6">Image or Placeholder</Typography>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: "auto",
-                height: "400px",
-              }}
-            >
-              <IconButton
-                onClick={handlePreviousPost}
-                disabled={selectedPostIndex === 0}
+        <DialogContent
+          sx={{
+            backgroundImage: filteredPosts[selectedPostIndex]?.post_image
+              ? `url(${filteredPosts[selectedPostIndex].post_image})`
+              : "none",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            minHeight: "300px",
+            color: "white",
+            padding: "20px",
+          }}
+        >
+          {selectedTag && filteredPosts.length > 0 ? (
+            <>
+              {filteredPosts[selectedPostIndex] && (
+                <Box
+                  sx={{
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    padding: "20px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom>
+                    {filteredPosts[selectedPostIndex].title}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {filteredPosts[selectedPostIndex].content}
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    Posted by{" "}
+                    {usernames[filteredPosts[selectedPostIndex].user_id] ||
+                      "Unknown"}
+                  </Typography>
+                </Box>
+              )}
+              <Box
                 sx={{
-                  cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: "transparent",
-                    boxShadow: "none",
-                  },
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "20px",
                 }}
               >
-                <ChevronLeft />
-              </IconButton>
-              <IconButton
-                onClick={handleNextPost}
-                disabled={selectedPostIndex === filteredPosts.length - 1}
-                sx={{
-                  cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: "transparent",
-                    boxShadow: "none",
-                  },
-                }}
-              >
-                <ChevronRight />
-              </IconButton>
-            </Box>
-          </Box>
-          {/* Right side with post details */}
-          <Box sx={{ flex: 2, padding: "20px" }}>
-            <Typography variant="h4" gutterBottom>
-              {filteredPosts[selectedPostIndex]?.title}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              Created by{" "}
-              {usernames[filteredPosts[selectedPostIndex]?.user_id] ||
-                "Unknown"}
-            </Typography>
+                <Button
+                  variant="contained"
+                  onClick={handlePreviousPost}
+                  disabled={selectedPostIndex === 0}
+                  startIcon={<ChevronLeft />}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleNextPost}
+                  disabled={selectedPostIndex === filteredPosts.length - 1}
+                  endIcon={<ChevronRight />}
+                >
+                  Next
+                </Button>
+              </Box>
+            </>
+          ) : (
             <Typography variant="body1">
-              {filteredPosts[selectedPostIndex]?.content}
+              No posts available for this hashtag.
             </Typography>
-          </Box>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Close
-          </Button>
+          <Button onClick={handleCloseDialog}>Close</Button>
         </DialogActions>
       </Dialog>
     </div>
